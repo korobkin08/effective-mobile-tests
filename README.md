@@ -9,7 +9,7 @@
 
 ### Установка
 ```bash
-git clone https://github.com/your-repo/effective-mobile-tests.git
+git clone https://github.com/korobkin08/effective-mobile-tests.git
 cd effective-mobile-tests
 python -m venv venv
 
