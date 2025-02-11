@@ -1,33 +1,29 @@
 import pytest
 from playwright.sync_api import sync_playwright
-from dotenv import load_dotenv
-from pathlib import Path
-
-env_path = Path('.') / '.env'
-
-load_dotenv()
 
 @pytest.fixture(scope="session")
 def browser():
     with sync_playwright() as p:
+        # Запуск с графическим интерфейсом для отладки
         browser = p.chromium.launch(
-            headless=True,
+            headless=False,
             args=[
                 "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu"
-            ]
+                "--start-maximized"
+            ],
+            timeout=60000
         )
         yield browser
         browser.close()
 
 @pytest.fixture
-def page(browser):
-    context = browser.new_context(
-        viewport={"width": 1920, "height": 1080},
-        locale="ru-RU",
-        timezone_id="Europe/Moscow"
-    )
+def context(browser):
+    context = browser.new_context(no_viewport=True)  # Полноэкранный режим
+    yield context
+    context.close()
+
+@pytest.fixture
+def page(context):
     page = context.new_page()
     yield page
-    context.close()
+    page.close()

@@ -4,28 +4,20 @@ from playwright.sync_api import Page, expect
 class MainPage:
     def __init__(self, page: Page):
         self.page = page
-        self.base_url = "https://effective-mobile.ru"
+        self.nav_links = {
+            "О нас": page.get_by_role("link", name="О нас"),
+            "Услуги": page.get_by_role("link", name="Услуги"),
+            "Проекты": page.get_by_role("link", name="Проекты"),
+            "Отзывы": page.get_by_role("link", name="Отзывы"),
+            "Контакты": page.get_by_role("link", name="Контакты"),
 
-        # Локаторы в формате {section: (link_selector, target_selector)}
-        self.sections = {
-            "about": ("a[href='#about']", "section#about"),
-            "services": ("a[href='#services']", "section#services"),
-            "contacts": ("a[href='#contacts']", "section#contacts"),
-            "projects": ("a[href='#projects']", "section#projects")
         }
 
-    def open(self) -> None:
-        self.page.goto(self.base_url)
-        self.page.wait_for_load_state("networkidle")
+    def navigate_to(self, url: str):
+        self.page.goto(url)
 
-    def navigate_to_section(self, section_name: str) -> None:
-        link_selector, target_selector = self.sections[section_name]
+    def click_nav_link(self, link_name: str):
+        self.nav_links[link_name].click()
 
-        with self.page.expect_navigation():
-            self.page.click(link_selector)
-
-        expect(self.page.locator(target_selector)).to_be_visible()
-
-    @property
-    def current_url(self) -> str:
-        return self.page.url
+    def check_current_url(self, expected_url: str):
+        expect(self.page).to_have_url(expected_url)
